@@ -1,4 +1,6 @@
 # Micro-Tic-Tac-Toe
+##All source files are in the src directory
+
 Tic Tac Toe game for ESP32 made on MicroPython; HTML; CSS & JS
 
 "boot.py" contains the code executed on the boot of the board (Wifi connect, Garbage Collector, etc)
