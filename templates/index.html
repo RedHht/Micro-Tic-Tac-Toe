@@ -1,0 +1,105 @@
+{% args TEAM %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroPython Ta-Te-Ti</title>
+    <style>
+        .boton {
+            width: 100px;
+            height: 100px;
+            margin: 5px;
+        }
+        #caja {
+            position: fixed; /* or absolute */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+<div id="caja">
+    <a><button id="boton0" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton1" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton2" class="boton" style="background-color: white;"></button></a>
+    <br>
+    <a><button id="boton3" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton4" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton5" class="boton" style="background-color: white;"></button></a>
+    <br>
+    <a><button id="boton6" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton7" class="boton" style="background-color: white;"></button></a>
+    <a><button id="boton8" class="boton" style="background-color: white;"></button></a>
+    <br>
+    {% if TEAM == "R" %}
+    <span>Estas jugando como el jugador: <span style="color: red;">Rojo</span></span>
+    {% elif TEAM == "G" %}
+    <span>Estas jugando como el jugador: <span style="color: green;">Verde</span></span>
+    {% endif %}
+</div>
+<script type="text/javascript">
+    function getCurrentHost () {
+        return window.location.host
+    }
+
+    function getCurrentURL () {
+        return window.location.href
+    }
+    
+    const url = getCurrentURL()
+    const host = getCurrentHost()
+    
+        // Crear una instancia de WebSocket
+    var ws = new WebSocket("ws://" + host + "/ws");
+
+    // Definir una función para manejar los mensajes entrantes
+    ws.onmessage = function(event) {
+      // Obtener el mensaje como un objeto JSON
+      var data = JSON.parse(event.data);
+      
+      console.log(event.data)
+
+      // Verificar el tipo de mensaje y realizar la acción correspondiente
+      switch (data.type) {
+        case "color":
+          // Cambiar el color de fondo de un elemento con el color enviado
+          document.getElementById(data.id).style.backgroundColor = data.value;
+          break;
+        case "alert":
+          // Mostrar una alerta con el mensaje enviado
+          alert(data.message);
+          break;
+        default:
+          // Ignorar los mensajes de otros tipos
+          console.log("Mensaje desconocido: " + data.type);
+      }
+    };
+
+
+    {% for i in range(9) %}    
+    
+    const button{{i}} = document.getElementById('boton{{i}}');
+
+    button{{i}}.addEventListener('click', async _ => {
+        try {
+            const response = await fetch("http://" + host + "/move?m={{TEAM}}{{i}}", {
+                method: 'post',
+                body: {
+                    // Your body
+                }
+            });
+            console.log('Completed!', response);
+        } catch(err) {
+            console.error(`Error: ${err}`);
+        }
+    });
+    
+    {% endfor %}
+    
+</script>
+</body>
+</html>
